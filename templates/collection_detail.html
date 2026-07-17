@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{{ plant.nickname }} · My collection{% endblock %}
+{% block content %}
+<section class="page-shell">
+  <a class="back-link animate-rise" href="/collection">← My collection</a>
+
+  <div class="collection-detail-layout animate-rise delay-1">
+    <div class="collection-detail-photo">
+      {% if plant.image_path %}
+      <img src="{{ plant.image_path }}" alt="{{ plant.nickname }}" />
+      {% else %}
+      <div class="collection-placeholder large" aria-hidden="true"></div>
+      {% endif %}
+    </div>
+
+    <div class="collection-detail-main">
+      <header class="detail-header">
+        <p class="eyebrow">{{ plant.source|capitalize }} · added {{ plant.created_at[:10] }}</p>
+        <h1 class="font-display">{{ plant.nickname }}</h1>
+        <p class="sci text-xl">{{ plant.species_name }}{% if plant.scientific_name %} · {{ plant.scientific_name }}{% endif %}</p>
+        {% if plant.location %}
+        <p class="aliases">Home: {{ plant.location }}</p>
+        {% endif %}
+        {% if plant.notes %}
+        <p class="detail-desc">{{ plant.notes }}</p>
+        {% endif %}
+      </header>
+
+      <section class="care-suggestions">
+        <h2 class="font-display">Care suggestions</h2>
+        <div class="suggestion-grid">
+          <article class="suggestion-card water-{{ plant.watering.status }}">
+            <h3>Watering</h3>
+            <p class="suggestion-status">{{ plant.watering.label }}</p>
+            <p>{{ plant.schedule.watering_tip }}</p>
+            <p class="suggestion-meta">Every ~{{ plant.schedule.watering_interval_days }} days · {{ plant.watering.message }}</p>
+          </article>
+          <article class="suggestion-card">
+            <h3>Light</h3>
+            <p>{{ plant.schedule.light }}</p>
+            <p class="suggestion-meta">{{ plant.schedule.light_tip }}</p>
+          </article>
+          <article class="suggestion-card">
+            <h3>Humidity</h3>
+            <p>{{ plant.schedule.humidity }}</p>
+            <p class="suggestion-meta">{{ plant.schedule.humidity_tip }}</p>
+          </article>
+          {% if plant.schedule.fertilize_interval_days > 0 %}
+          <article class="suggestion-card">
+            <h3>Feed</h3>
+            <p>Every ~{{ plant.schedule.fertilize_interval_days }} days in growing season</p>
+            <p class="suggestion-meta">{{ plant.schedule.fertilize_tip }}</p>
+          </article>
+          {% endif %}
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <section class="records-block animate-rise delay-2">
+    <h2 class="font-display">Quick log</h2>
+    <div class="log-actions">
+      <form method="post" action="/collection/{{ plant.id }}/record">
+        <input type="hidden" name="record_type" value="watered" />
+        <button type="submit" class="btn btn-primary">Watered today</button>
+      </form>
+      <form method="post" action="/collection/{{ plant.id }}/record">
+        <input type="hidden" name="record_type" value="fertilized" />
+        <button type="submit" class="btn btn-ghost dark">Fertilized</button>
+      </form>
+      <form method="post" action="/collection/{{ plant.id }}/record">
+        <input type="hidden" name="record_type" value="note" />
+        <input type="text" name="note" placeholder="Add a note…" class="log-note-input" />
+        <button type="submit" class="btn btn-ghost dark">Save note</button>
+      </form>
+    </div>
+
+    <h3 class="records-title">History</h3>
+    {% if plant.records %}
+    <ul class="record-list">
+      {% for record in plant.records %}
+      <li>
+        <span class="record-type">{{ record.record_type }}</span>
+        <span class="record-when">{{ record.recorded_at[:16].replace('T', ' ') }}</span>
+        {% if record.note %}<p>{{ record.note }}</p>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="empty-state">No records yet — log a watering to start.</p>
+    {% endif %}
+
+    <form method="post" action="/collection/{{ plant.id }}/delete" class="delete-form" onsubmit="return confirm('Remove this plant from your collection?');">
+      <button type="submit" class="btn btn-ghost dark danger">Remove plant</button>
+    </form>
+  </section>
+</section>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Sign in · BloomScan{% endblock %}
+{% block content %}
+<section class="page-shell narrow">
+  <div class="auth-card animate-rise">
+    <h1 class="font-display">Welcome back</h1>
+    <p>Sign in to see your plant collection and care reminders.</p>
+    {% if error %}
+    <p class="form-error">{{ error }}</p>
+    {% endif %}
+    <form method="post" action="/auth/signin" class="auth-form">
+      <label class="field">
+        <span>Email</span>
+        <input type="email" name="email" required value="{{ email or '' }}" placeholder="you@example.com" />
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input type="password" name="password" required placeholder="Your password" />
+      </label>
+      <button type="submit" class="btn btn-primary w-full">Sign in</button>
+    </form>
+    <p class="auth-switch">New here? <a href="/auth/signup">Create an account</a></p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Search · BloomScan{% endblock %}
+{% block content %}
+<section class="page-shell">
+  <div class="page-intro animate-rise">
+    <h1 class="font-display">Find a plant</h1>
+    <p>
+      Type a nickname or the fancy Latin — like
+      <em>Venus flytrap</em> or <em>Dionaea muscipula</em>. Browse 500+ plants with photos.
+    </p>
+  </div>
+
+  <div class="search-bar animate-rise delay-1">
+    <label class="sr-only" for="plant-search">Search plants</label>
+    <input
+      id="plant-search"
+      type="search"
+      value="{{ query }}"
+      placeholder="Who are we looking for?"
+      autocomplete="off"
+      autofocus
+    />
+  </div>
+
+  <div class="suggest-row animate-rise delay-2" aria-label="Popular searches">
+    {% for tip in suggestions %}
+    <button type="button" class="chip" data-query="{{ tip }}">{{ tip }}</button>
+    {% endfor %}
+  </div>
+
+  <div id="search-results" class="result-grid">
+    {% for plant in results %}
+    <a class="plant-row animate-rise" href="/plants/{{ plant.id }}" style="--i: {{ loop.index0 }}">
+      <div class="plant-row-thumb">
+        <img src="{{ plant.image_url or '/static/images/plant-placeholder.svg' }}" alt="" loading="lazy" />
+      </div>
+      <div class="plant-row-text">
+        <h2>{{ plant.primary_name }}</h2>
+        <p class="sci">{{ plant.scientific_name }}</p>
+        {% if plant.watering_frequency %}
+        <p class="watering-freq">Water {{ plant.watering_frequency|lower }}</p>
+        {% endif %}
+        <p class="clip">{{ plant.description }}</p>
+      </div>
+    </a>
+    {% else %}
+    <p class="empty-state">Hmm, no plant by that name. Try another spelling?</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/search.js"></script>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Scan · BloomScan{% endblock %}
+{% block content %}
+<section class="scan-page">
+  <div class="scan-page-inner">
+  <div class="page-intro animate-rise">
+    <h1 class="font-display">Scan a plant</h1>
+    <p>
+      Pop in a photo (or take one) and BloomScan will check what’s going on —
+      issues, causes, and how to help.
+    </p>
+    {% if not openai_ready %}
+    <p class="mode-note">Demo mode: cozy catalog tips until you add an OpenAI key.</p>
+    {% endif %}
+    <ul class="scan-tips" aria-label="Photo tips">
+      <li>Good light helps</li>
+      <li>Show leaves + soil</li>
+      <li>Name it in notes</li>
+    </ul>
+  </div>
+
+  <div class="scan-layout" id="scan-layout">
+    <form id="scan-form" class="scan-panel animate-rise delay-1">
+      <label class="upload-zone" id="upload-zone" for="image-input">
+        <input
+          id="image-input"
+          name="image"
+          type="file"
+          accept="image/*"
+          capture="environment"
+          required
+        />
+        <div id="preview-wrap" class="preview-wrap hidden">
+          <img id="preview" alt="Selected plant photo preview" />
+          <button type="button" id="clear-photo" class="clear-photo">Change photo</button>
+        </div>
+        <div id="upload-prompt" class="upload-prompt">
+          <span class="upload-bubble" aria-hidden="true"></span>
+          <span class="upload-title">Drop a photo or tap to snap</span>
+          <span class="upload-sub">JPG, PNG, or HEIC · up to 8 MB</span>
+        </div>
+      </label>
+
+      <label class="field">
+        <span>Extra notes (optional)</span>
+        <textarea
+          id="notes"
+          name="notes"
+          rows="3"
+          placeholder="e.g. cute little Venus flytrap, traps turning black"
+        ></textarea>
+      </label>
+
+      <button type="submit" class="btn btn-primary w-full" id="submit-btn">
+        <span id="btn-label">Check my plant</span>
+        <span id="btn-spinner" class="btn-spinner hidden" aria-hidden="true"></span>
+      </button>
+      <p id="scan-status" class="scan-status" role="status" aria-live="polite"></p>
+    </form>
+
+    <div id="result" class="result-panel hidden" aria-live="polite"></div>
+  </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/scan.js"></script>
+{% endblock %}

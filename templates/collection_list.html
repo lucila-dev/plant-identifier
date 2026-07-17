@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}My collection · BloomScan{% endblock %}
+{% block content %}
+<section class="page-shell">
+  <div class="page-intro animate-rise collection-header">
+    <div>
+      <h1 class="font-display">Hi, {{ user.name }}!</h1>
+      <p>Your plant pals — {{ plants|length }} in the greenhouse.</p>
+    </div>
+    <a class="btn btn-primary" href="/collection/add">Add a plant</a>
+  </div>
+
+  {% if plants %}
+  <div class="collection-grid">
+    {% for plant in plants %}
+    <a class="collection-card animate-rise" href="/collection/{{ plant.id }}" style="--i: {{ loop.index0 }}">
+      <div class="collection-thumb">
+        {% if plant.image_path %}
+        <img src="{{ plant.image_path }}" alt="{{ plant.nickname }}" />
+        {% else %}
+        <div class="collection-placeholder" aria-hidden="true"></div>
+        {% endif %}
+        <span class="water-badge water-{{ plant.watering.status }}">{{ plant.watering.label }}</span>
+      </div>
+      <div class="collection-card-body">
+        <h2>{{ plant.nickname }}</h2>
+        <p class="sci">{{ plant.species_name or plant.scientific_name or 'Custom plant' }}</p>
+        {% if plant.location %}
+        <p class="clip">{{ plant.location }}</p>
+        {% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-collection animate-rise delay-1">
+    <p>No plants yet — add one manually or save from a scan.</p>
+    <div class="hero-actions detail-actions">
+      <a class="btn btn-primary" href="/collection/add">Add manually</a>
+      <a class="btn btn-ghost dark" href="/scan">Scan a plant</a>
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Add plant · BloomScan{% endblock %}
+{% block content %}
+<section class="page-shell narrow">
+  <a class="back-link animate-rise" href="/collection">← My collection</a>
+  <div class="page-intro animate-rise delay-1">
+    <h1 class="font-display">Add a plant</h1>
+    <p>Give them a nickname, snap a photo, and BloomScan will suggest a care rhythm.</p>
+  </div>
+
+  <form method="post" action="/collection/add" enctype="multipart/form-data" class="scan-panel animate-rise delay-2">
+    {% if catalog_plant %}
+    <p class="mode-note">Adding from catalog: {{ catalog_plant.common_names[0] }}</p>
+    <input type="hidden" name="catalog_plant_id" value="{{ catalog_id }}" />
+    {% endif %}
+
+    <label class="field">
+      <span>Nickname</span>
+      <input type="text" name="nickname" required value="{{ nickname }}" placeholder="e.g. Frank the Monstera" />
+    </label>
+
+    <label class="field">
+      <span>Species / type</span>
+      <input type="text" name="species_name" value="{{ species }}" placeholder="Monstera, Snake plant…" />
+    </label>
+
+    <label class="field">
+      <span>Scientific name (optional)</span>
+      <input type="text" name="scientific_name" value="{{ scientific }}" placeholder="Monstera deliciosa" />
+    </label>
+
+    <label class="field">
+      <span>Where they live</span>
+      <input type="text" name="location" placeholder="Kitchen window, bedroom shelf…" />
+    </label>
+
+    <label class="field">
+      <span>Notes</span>
+      <textarea name="notes" rows="3" placeholder="Anything special about this plant?"></textarea>
+    </label>
+
+    <label class="upload-zone upload-zone-compact" for="add-image">
+      <input id="add-image" name="image" type="file" accept="image/*" capture="environment" />
+      <div class="upload-prompt">
+        <span class="upload-bubble" aria-hidden="true"></span>
+        <span class="upload-title">Add a photo (optional)</span>
+        <span class="upload-sub">Tap to upload or capture</span>
+      </div>
+    </label>
+
+    <button type="submit" class="btn btn-primary w-full">Save to collection</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ plant.common_names[0] }} · BloomScan{% endblock %}
+{% block content %}
+<section class="page-shell narrow">
+  <a class="back-link animate-rise" href="/search">← Back to search</a>
+
+  <header class="detail-header animate-rise delay-1">
+    <div class="catalog-hero" style="aspect-ratio:1/1;width:min(100%,420px);position:relative;overflow:hidden">
+      <img
+        src="{{ plant.image_url or '/static/images/plant-placeholder.svg' }}"
+        alt="{{ plant.common_names[0] }}"
+        style="position:absolute;inset:0;width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;object-position:center"
+      />
+    </div>
+    <p class="eyebrow">{{ plant.family }}</p>
+    <h1 class="font-display">
+      {{ plant.common_names[0] }}
+    </h1>
+    <p class="sci text-xl">{{ plant.scientific_name }}</p>
+    {% if plant.common_names|length > 1 %}
+    <p class="aliases">Also called: {{ plant.common_names[1:] | join(", ") }}</p>
+    {% endif %}
+    <p class="detail-desc">{{ plant.description }}</p>
+    <p class="detail-actions">
+      <a class="btn btn-primary" href="/scan?notes={{ plant.common_names[0]|urlencode }}">Scan a photo of this cutie</a>
+      {% if user %}
+      <a class="btn btn-ghost dark" href="/collection/add?catalog={{ plant.id }}">Add to my collection</a>
+      {% else %}
+      <a class="btn btn-ghost dark" href="/auth/signin">Sign in to save plants</a>
+      {% endif %}
+    </p>
+  </header>
+
+  <section class="care-block animate-rise delay-2">
+    <h2>Care basics</h2>
+    <dl class="care-grid">
+      <div>
+        <dt>Light</dt>
+        <dd>{{ plant.care.light }}</dd>
+      </div>
+      <div>
+        <dt>Water</dt>
+        <dd>{{ plant.care.water }}</dd>
+      </div>
+      <div>
+        <dt>Humidity</dt>
+        <dd>{{ plant.care.humidity }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  {% if plant.common_issues %}
+  <section class="issues-block animate-rise delay-3">
+    <h2>Common problems</h2>
+    <div class="issue-stack">
+      {% for issue in plant.common_issues %}
+      <article class="issue">
+        <h3>{{ issue.symptom }}</h3>
+        <div class="issue-cols">
+          <div>
+            <h4>Possible causes</h4>
+            <ul>
+              {% for c in issue.causes %}<li>{{ c }}</li>{% endfor %}
+            </ul>
+          </div>
+          <div>
+            <h4>Treatment</h4>
+            <ul>
+              {% for t in issue.treatments %}<li>{{ t }}</li>{% endfor %}
+            </ul>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if related %}
+  <section class="related-block animate-rise">
+    <h2>Related plants</h2>
+    <div class="featured-row">
+      {% for item in related %}
+      <a class="featured-item" href="/plants/{{ item.id }}" style="--i: {{ loop.index0 }}">
+        <span class="featured-name">{{ item.primary_name }}</span>
+        <span class="sci">{{ item.scientific_name }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</section>
+{% endblock %}

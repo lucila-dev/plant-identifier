@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}BloomScan — cute plant scan{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-media" aria-hidden="true"></div>
+  <div class="hero-veil" aria-hidden="true"></div>
+  <div class="hero-doodles" aria-hidden="true">
+    <span class="doodle leaf-1"></span>
+    <span class="doodle leaf-2"></span>
+    <span class="doodle spark"></span>
+  </div>
+  <div class="hero-copy">
+    <p class="brand-lockup animate-rise">BloomScan</p>
+    <h1 class="animate-rise delay-1">Your plant buddy for “why does it look like that?”</h1>
+    <p class="hero-lede animate-rise delay-2">
+      Snap a pic, get gentle tips on what’s wrong, why it happens, and how to help —
+      or search by nickname or Latin name.
+    </p>
+    <div class="hero-actions animate-rise delay-3">
+      <a class="btn btn-primary" href="/scan">Scan my plant</a>
+      <a class="btn btn-ghost" href="/search">Find a plant</a>
+    </div>
+  </div>
+</section>
+
+<section class="home-band">
+  <div class="home-band-inner">
+    <header class="page-intro animate-rise">
+      <h2 class="font-display">How BloomScan helps</h2>
+      <p>Pick a path — photo magic or name search.</p>
+    </header>
+    <div class="path-grid">
+      <a class="path-link animate-rise delay-1" href="/scan">
+        <span class="path-kicker">Scan</span>
+        <strong>Show us a photo</strong>
+        <span>We’ll guess the plant and unpack issues, causes, and care.</span>
+      </a>
+      <a class="path-link animate-rise delay-2" href="/search">
+        <span class="path-kicker">Search</span>
+        <strong>Look up by name</strong>
+        <span>Venus flytrap, snake plant, Dionaea — whatever you call it.</span>
+      </a>
+    </div>
+
+    <header class="page-intro featured-intro animate-rise">
+      <h2 class="font-display">Plant pals to start with</h2>
+      <p>Tap any favorite for care notes and common hiccups.</p>
+    </header>
+    <div class="featured-row">
+      {% for plant in featured %}
+      <a class="featured-item animate-rise" href="/plants/{{ plant.id }}" style="--i: {{ loop.index0 }}">
+        <span class="featured-thumb">
+          <img src="{{ plant.image_url or '/static/images/plant-placeholder.svg' }}" alt="" loading="lazy" />
+        </span>
+        <span class="featured-name">{{ plant.primary_name }}</span>
+        <span class="sci">{{ plant.scientific_name }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

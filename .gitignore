@@ -1,0 +1,18 @@
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.DS_Store
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+dist/
+build/
+data/bloomscan.db
+static/uploads/collection/*
+!static/uploads/collection/.gitkeep
+
+# Regeneratable data backups / build caches
+*.bak
+data/plants.json.*
+data/image_cache.json

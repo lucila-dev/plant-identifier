@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}BloomScan{% endblock %}</title>
+    <meta
+      name="description"
+      content="Cute plant scan app — snap a photo, learn what’s up, and how to help."
+    />
+    <meta name="theme-color" content="#7ED39A" />
+    <link rel="icon" href="/static/favicon.ico" sizes="any" />
+    <link rel="icon" href="/static/images/favicon-32x32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/static/images/favicon-96x96.png" type="image/png" sizes="96x96" />
+    <link rel="apple-touch-icon" href="/static/images/apple-touch-icon.png" />
+    <link rel="manifest" href="/static/site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@450;550;650&family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              leaf: {
+                900: "#245836",
+                700: "#3a9a5c",
+                500: "#5cba7d",
+                300: "#9fe0b4",
+                100: "#e2f8ea",
+                50: "#f3fbf6",
+              },
+              blush: "#ff9eb5",
+              sun: "#ffd66b",
+              soil: "#3d4a3f",
+            },
+            fontFamily: {
+              display: ["Fredoka", "Nunito", "system-ui", "sans-serif"],
+              sans: ["Nunito", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="/static/css/style.css?v=square2" />
+  </head>
+  <body class="font-sans antialiased {{ page_class|default('page-inner') }}" data-signed-in="{% if user %}true{% else %}false{% endif %}">
+    <div class="blob blob-a" aria-hidden="true"></div>
+    <div class="blob blob-b" aria-hidden="true"></div>
+    <div class="dot-grid" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="brand" href="/">
+        <img
+          class="brand-mark"
+          src="/static/images/favicon-96x96.png"
+          alt=""
+          width="32"
+          height="32"
+          decoding="async"
+        />
+        BloomScan
+      </a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/" class="{% if active == 'home' %}is-active{% endif %}">Home</a>
+        <a href="/scan" class="{% if active == 'scan' %}is-active{% endif %}">Scan</a>
+        <a href="/search" class="{% if active == 'search' %}is-active{% endif %}">Search</a>
+        {% if user %}
+        <a href="/collection" class="{% if active == 'collection' %}is-active{% endif %}">Collection</a>
+        {% endif %}
+      </nav>
+      <div class="auth-nav">
+        {% if user %}
+        <form method="post" action="/auth/signout">
+          <button type="submit" class="auth-btn">Sign out</button>
+        </form>
+        {% else %}
+        <a class="auth-btn" href="/auth/signin">Sign in</a>
+        {% endif %}
+      </div>
+    </header>
+    <main>{% block content %}{% endblock %}</main>
+    <footer class="site-footer">
+      <p>BloomScan · made for plant parents</p>
+    </footer>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
