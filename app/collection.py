@@ -95,6 +95,23 @@ def list_collection(user_id: int) -> list[dict]:
     return items
 
 
+def find_collection_by_catalog(user_id: int, catalog_plant_id: str) -> Optional[dict]:
+    """Return an existing collection entry linked to a catalog plant, if any."""
+    if not catalog_plant_id:
+        return None
+    with get_connection() as conn:
+        row = conn.execute(
+            """
+            SELECT * FROM collection_plants
+            WHERE user_id = ? AND catalog_plant_id = ?
+            ORDER BY created_at ASC
+            LIMIT 1
+            """,
+            (user_id, catalog_plant_id),
+        ).fetchone()
+    return _row_to_dict(row) if row else None
+
+
 def get_collection_plant(user_id: int, plant_id: int) -> Optional[dict]:
     with get_connection() as conn:
         row = conn.execute(
@@ -298,3 +315,44 @@ def delete_collection_plant(user_id: int, plant_id: int) -> None:
         file_path = Path(__file__).resolve().parent.parent / image_path.lstrip("/")
         if file_path.exists():
             file_path.unlink(missing_ok=True)
+
+
+def delete_collection_plants(user_id: int, plant_ids: list[int]) -> int:
+    """Delete multiple plants owned by the user. Returns the number removed."""
+    ids = []
+    for pid in plant_ids:
+        try:
+            ids.append(int(pid))
+        except (TypeError, ValueError):
+            continue
+    ids = list(dict.fromkeys(ids))
+    if not ids:
+        return 0
+
+    placeholders = ",".join("?" for _ in ids)
+    with get_connection() as conn:
+        rows = conn.execute(
+            f"SELECT id, image_path FROM collection_plants "
+            f"WHERE user_id = ? AND id IN ({placeholders})",
+            (user_id, *ids),
+        ).fetchall()
+        found = [_row_to_dict(r) for r in rows]
+        if not found:
+            return 0
+        found_ids = [r["id"] for r in found]
+        del_placeholders = ",".join("?" for _ in found_ids)
+        conn.execute(
+            f"DELETE FROM collection_plants "
+            f"WHERE user_id = ? AND id IN ({del_placeholders})",
+            (user_id, *found_ids),
+        )
+
+    base_dir = Path(__file__).resolve().parent.parent
+    for item in found:
+        image_path = item.get("image_path")
+        if image_path and image_path.startswith("/static/uploads/"):
+            file_path = base_dir / image_path.lstrip("/")
+            if file_path.exists():
+                file_path.unlink(missing_ok=True)
+
+    return len(found)

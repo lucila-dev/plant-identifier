@@ -30,24 +30,38 @@
 
   <div id="search-results" class="result-grid">
     {% for plant in results %}
-    <a class="plant-row animate-rise" href="/plants/{{ plant.id }}" style="--i: {{ loop.index0 }}">
-      <div class="plant-row-thumb">
-        <img src="{{ plant.image_url or '/static/images/plant-placeholder.svg' }}" alt="" loading="lazy" />
-      </div>
-      <div class="plant-row-text">
-        <h2>{{ plant.primary_name }}</h2>
-        <p class="sci">{{ plant.scientific_name }}</p>
-        {% if plant.watering_frequency %}
-        <p class="watering-freq">Water {{ plant.watering_frequency|lower }}</p>
-        {% endif %}
-        <p class="clip">{{ plant.description }}</p>
-      </div>
-    </a>
+    <div class="plant-row animate-rise" style="--i: {{ loop.index0 }}">
+      <a class="plant-row-link" href="/plants/{{ plant.id }}">
+        <div class="plant-row-thumb">
+          <img src="{{ plant.image_url or '/static/images/plant-placeholder.svg' }}" alt="" loading="lazy" />
+        </div>
+        <div class="plant-row-text">
+          <h2>{{ plant.primary_name }}</h2>
+          <p class="sci">{{ plant.scientific_name }}</p>
+          {% if plant.watering_frequency %}
+          <p class="watering-freq">Water {{ plant.watering_frequency|lower }}</p>
+          {% endif %}
+          <p class="clip">{{ plant.description }}</p>
+        </div>
+      </a>
+      <button
+        type="button"
+        class="quick-add-btn"
+        data-id="{{ plant.id }}"
+        data-name="{{ plant.primary_name }}"
+        data-sci="{{ plant.scientific_name }}"
+        aria-label="Quick add {{ plant.primary_name }} to your collection"
+      >
+        <span class="quick-add-icon" aria-hidden="true">+</span>
+        <span class="quick-add-label">Add</span>
+      </button>
+    </div>
     {% else %}
     <p class="empty-state">Hmm, no plant by that name. Try another spelling?</p>
     {% endfor %}
   </div>
 </section>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 {% endblock %}
 {% block scripts %}
 <script src="/static/js/search.js"></script>

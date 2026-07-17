@@ -1,19 +1,37 @@
 {% extends "base.html" %}
 {% block title %}My collection · BloomScan{% endblock %}
 {% block content %}
-<section class="page-shell">
+<section class="page-shell" data-collection>
   <div class="page-intro animate-rise collection-header">
     <div>
       <h1 class="font-display">Hi, {{ user.name }}!</h1>
       <p>Your plant pals — {{ plants|length }} in the greenhouse.</p>
     </div>
-    <a class="btn btn-primary" href="/collection/add">Add a plant</a>
+    <div class="collection-header-actions">
+      {% if plants %}
+      <button type="button" class="btn btn-ghost dark" id="select-toggle">Select</button>
+      {% endif %}
+      <a class="btn btn-primary" href="/collection/add">Add a plant</a>
+    </div>
   </div>
 
   {% if plants %}
-  <div class="collection-grid">
+  <div class="select-toolbar" id="select-toolbar" hidden>
+    <span class="select-count" id="select-count">0 selected</span>
+    <div class="select-toolbar-actions">
+      <button type="button" class="btn btn-ghost dark" id="select-all">Select all</button>
+      <button type="button" class="btn danger" id="delete-selected" disabled>Delete selected</button>
+      <button type="button" class="btn btn-ghost dark" id="select-cancel">Cancel</button>
+    </div>
+  </div>
+
+  <div class="collection-grid" id="collection-grid">
     {% for plant in plants %}
-    <a class="collection-card animate-rise" href="/collection/{{ plant.id }}" style="--i: {{ loop.index0 }}">
+    <a class="collection-card animate-rise" href="/collection/{{ plant.id }}" style="--i: {{ loop.index0 }}" data-plant-id="{{ plant.id }}">
+      <label class="card-select" aria-label="Select {{ plant.nickname }}">
+        <input type="checkbox" class="card-select-input" value="{{ plant.id }}" />
+        <span class="card-select-box" aria-hidden="true"></span>
+      </label>
       <div class="collection-thumb">
         {% if plant.image_path %}
         <img src="{{ plant.image_path }}" alt="{{ plant.nickname }}" />
@@ -42,4 +60,7 @@
   </div>
   {% endif %}
 </section>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/collection.js?v=multiselect1"></script>
 {% endblock %}

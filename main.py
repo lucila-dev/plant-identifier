@@ -25,6 +25,8 @@ from app.auth import (
 from app.collection import (
     add_collection_plant,
     delete_collection_plant,
+    delete_collection_plants,
+    find_collection_by_catalog,
     get_collection_plant,
     list_collection,
     log_record,
@@ -341,6 +343,22 @@ async def collection_delete(request: Request, plant_id: int):
     return RedirectResponse("/collection", status_code=303)
 
 
+@app.post("/api/collection/bulk-delete")
+async def api_collection_bulk_delete(request: Request):
+    user = require_user(request)
+    try:
+        payload = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid request body.")
+
+    ids = payload.get("ids") if isinstance(payload, dict) else None
+    if not isinstance(ids, list) or not ids:
+        raise HTTPException(status_code=400, detail="No plants selected.")
+
+    deleted = delete_collection_plants(user["id"], ids)
+    return JSONResponse({"deleted": deleted})
+
+
 @app.get("/api/plants/search")
 async def api_search(q: str = Query(""), limit: int = Query(24, ge=1, le=50)):
     return {"results": [r.model_dump() for r in search_plants(q, limit=limit)]}
@@ -393,6 +411,48 @@ async def api_collection_from_scan(
         source="scan",
     )
     return JSONResponse({"id": plant_id, "url": f"/collection/{plant_id}"})
+
+
+@app.post("/api/collection/quick-add")
+async def api_collection_quick_add(
+    request: Request,
+    catalog_plant_id: str = Form(...),
+    nickname: str = Form(""),
+    species_name: str = Form(""),
+    scientific_name: str = Form(""),
+):
+    user = require_user(request)
+    catalog = get_plant(catalog_plant_id)
+    if not catalog:
+        raise HTTPException(status_code=404, detail="We couldn't find that plant.")
+
+    existing = find_collection_by_catalog(user["id"], catalog_plant_id)
+    if existing:
+        return JSONResponse(
+            {
+                "status": "exists",
+                "id": existing["id"],
+                "url": f"/collection/{existing['id']}",
+                "name": existing.get("nickname") or catalog.common_names[0],
+            }
+        )
+
+    plant_id = add_collection_plant(
+        user["id"],
+        nickname=nickname or species_name or catalog.common_names[0],
+        catalog_plant_id=catalog_plant_id,
+        species_name=species_name,
+        scientific_name=scientific_name,
+        source="catalog",
+    )
+    return JSONResponse(
+        {
+            "status": "added",
+            "id": plant_id,
+            "url": f"/collection/{plant_id}",
+            "name": nickname or species_name or catalog.common_names[0],
+        }
+    )
 
 
 @app.get("/health")
