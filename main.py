@@ -45,7 +45,25 @@ app.mount(
     StaticFiles(directory=BASE_DIR / "static", check_dir=False),
     name="static",
 )
-templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
+
+class _Templates(Jinja2Templates):
+    """Accept the legacy ``TemplateResponse(name, context)`` call style.
+
+    Starlette removed that signature in favour of ``TemplateResponse(request,
+    name, context)``. This shim keeps the existing call sites working by pulling
+    the request out of the context dict.
+    """
+
+    def TemplateResponse(self, name, context=None, *args, **kwargs):
+        if isinstance(name, str):
+            context = context or {}
+            request = context.get("request")
+            return super().TemplateResponse(request, name, context, *args, **kwargs)
+        return super().TemplateResponse(name, context, *args, **kwargs)
+
+
+templates = _Templates(directory=str(BASE_DIR / "templates"))
 
 MAX_IMAGE_BYTES = 8 * 1024 * 1024
 

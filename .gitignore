@@ -16,3 +16,5 @@ static/uploads/collection/*
 *.bak
 data/plants.json.*
 data/image_cache.json
+.vercel
+.env*
