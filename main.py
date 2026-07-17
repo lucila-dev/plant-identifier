@@ -40,7 +40,11 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent
 app = FastAPI(title="BloomScan", description="Plant search and photo diagnosis")
 app.add_middleware(SessionMiddleware, secret_key=get_session_secret(), https_only=False)
-app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+app.mount(
+    "/static",
+    StaticFiles(directory=BASE_DIR / "static", check_dir=False),
+    name="static",
+)
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 MAX_IMAGE_BYTES = 8 * 1024 * 1024
@@ -60,7 +64,10 @@ SUGGESTIONS = [
 @app.on_event("startup")
 def on_startup():
     init_db()
-    UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        pass
 
 
 def page_context(request: Request, **extra):

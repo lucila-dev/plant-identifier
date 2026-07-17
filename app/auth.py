@@ -7,7 +7,7 @@ from typing import Optional
 from fastapi import HTTPException, Request
 from passlib.context import CryptContext
 
-from app.database import get_connection
+from app.database import get_connection, insert_returning_id
 
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
@@ -44,11 +44,11 @@ def create_user(email: str, name: str, password: str) -> int:
         ).fetchone()
         if existing:
             raise HTTPException(status_code=400, detail="An account with that email already exists.")
-        cur = conn.execute(
+        return insert_returning_id(
+            conn,
             "INSERT INTO users (email, name, password_hash) VALUES (?, ?, ?)",
             (email, name, hash_password(password)),
         )
-        return int(cur.lastrowid)
 
 
 def authenticate_user(email: str, password: str) -> Optional[dict]:

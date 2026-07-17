@@ -8,7 +8,12 @@ from typing import Optional
 from fastapi import HTTPException, UploadFile
 
 from app.care_schedule import build_care_schedule, watering_status
-from app.database import UPLOADS_DIR, get_connection
+from app.database import (
+    UPLOADS_DIR,
+    UPLOADS_ENABLED,
+    get_connection,
+    insert_returning_id,
+)
 from app.plants import get_plant
 
 MAX_IMAGE_BYTES = 8 * 1024 * 1024
@@ -41,7 +46,7 @@ def _with_display_image(item: dict) -> dict:
     return item
 
 
-async def save_plant_image(upload: UploadFile) -> str:
+async def save_plant_image(upload: UploadFile) -> Optional[str]:
     content_type = (upload.content_type or "").lower()
     if content_type and content_type not in ALLOWED_TYPES and not content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="Please upload an image file.")
@@ -50,6 +55,11 @@ async def save_plant_image(upload: UploadFile) -> str:
         raise HTTPException(status_code=400, detail="Image file is empty.")
     if len(data) > MAX_IMAGE_BYTES:
         raise HTTPException(status_code=400, detail="Image must be under 8 MB.")
+
+    # On serverless the filesystem is ephemeral/read-only: skip persisting the
+    # upload and let the caller fall back to the catalog image.
+    if not UPLOADS_ENABLED:
+        return None
 
     ext = ".jpg"
     if "png" in content_type:
@@ -158,7 +168,8 @@ def add_collection_plant(
     )
 
     with get_connection() as conn:
-        cur = conn.execute(
+        plant_id = insert_returning_id(
+            conn,
             """
             INSERT INTO collection_plants (
                 user_id, nickname, catalog_plant_id, species_name, scientific_name,
@@ -184,7 +195,6 @@ def add_collection_plant(
                 source,
             ),
         )
-        plant_id = int(cur.lastrowid)
         conn.execute(
             """
             INSERT INTO plant_records (collection_plant_id, record_type, note)
