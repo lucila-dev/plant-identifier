@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 BASE_URL = "https://perenual.com/api/v2"
-USER_AGENT = "BloomScan/1.0 (plant identifier; educational; contact@example.com)"
+USER_AGENT = "BloomScan/1.0 (plant identifier; educational; lucilaforno26@gmail.com)"
 REQUEST_DELAY = 0.6
 MAX_RETRIES = 3
 UPGRADE_MARKERS = ("upgrade_access", "image/upgrade")

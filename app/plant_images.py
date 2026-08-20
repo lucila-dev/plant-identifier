@@ -19,7 +19,7 @@ CACHE_PATH = Path(__file__).resolve().parent.parent / "data" / "image_cache.json
 PLANTS_PATH = Path(__file__).resolve().parent.parent / "data" / "plants.json"
 CATALOG_DIR = Path(__file__).resolve().parent.parent / "static" / "images" / "catalog"
 PLACEHOLDER = "/static/images/plant-placeholder.svg"
-USER_AGENT = "BloomScan/1.0 (plant identifier; educational; contact@example.com)"
+USER_AGENT = "BloomScan/1.0 (plant identifier; educational; lucilaforno26@gmail.com)"
 # Wikimedia blocks some bot UAs with 403; use a browser-like UA for image bytes.
 IMAGE_USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
