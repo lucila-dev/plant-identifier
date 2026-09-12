@@ -10,3 +10,4 @@ data/plants.json.*
 data/image_cache.json
 static/uploads/collection/*
 !static/uploads/collection/.gitkeep
+
