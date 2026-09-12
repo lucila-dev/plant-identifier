@@ -7,3 +7,4 @@ application and serves it. All routing is delegated to the FastAPI app in
 from main import app
 
 __all__ = ["app"]
+
